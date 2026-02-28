@@ -39,7 +39,7 @@ export async function POST(request) {
       },
     });
 
-    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetLink = `https://quiz-master-two-iota.vercel.app/reset-password/${resetToken}`;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
