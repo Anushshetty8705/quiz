@@ -17,7 +17,7 @@ export async function POST(req) {
 
     // Connect MongoDB
     const client = await clientPromise;
-    const db = client.db("Xtrack");
+    const db = client.db("Quiz");
     const otpCollection = db.collection("otp");
 
     // Save OTP (overwrite old)
