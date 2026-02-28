@@ -89,7 +89,7 @@ export default function QuizDetails() {
   };
 
   if (loading) return <div className="text-white p-6">Loading...</div>;
-  if (!quiz) return <div className="text-white p-6">Quiz Not Found</div>;
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black text-white p-6">
@@ -119,8 +119,8 @@ export default function QuizDetails() {
       {/* INFO CARDS */}
       <div className="grid md:grid-cols-3 gap-6 mb-10">
         <InfoCard title="Quiz Code" value={id} color="text-indigo-400" />
-        <InfoCard title="Total Students" value={quiz.studentCount} color="text-green-400" />
-        <InfoCard title="Average Score" value={quiz.averageScore.toFixed(2)} color="text-yellow-400" />
+        <InfoCard title="Total Students" value={quiz?.studentCount || 0} color="text-green-400" />
+        <InfoCard title="Average Score" value={quiz?.averageScore.toFixed(2) || 0} color="text-yellow-400" />
       </div>
 
       {/* ANALYTICS */}

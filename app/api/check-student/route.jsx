@@ -11,7 +11,12 @@ export async function GET(req) {
   const collection = db.collection(quizId);
 
   const student = await collection.findOne({ id: studentId });
+const quizlocked = await db.collection("quizzes").findOne({ 
+quizCode: quizId });
 
+  if(quizlocked && quizlocked.isLocked){
+    return NextResponse.json({ success: true, student: { locked: true, lockedReason: "Quiz is locked by the teacher." } });
+  }
   if (!student) {
     return NextResponse.json({ success: false });
   }

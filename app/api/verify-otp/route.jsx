@@ -5,7 +5,7 @@ export async function POST(req) {
     const { email, otp } = await req.json();
 
     const client = await clientPromise;
-    const db = client.db("Xtrack");
+    const db = client.db("Quiz");
     const otpCollection = db.collection("otp");
 
     const record = await otpCollection.findOne({ email });

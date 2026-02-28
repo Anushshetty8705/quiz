@@ -73,6 +73,7 @@ export default function QuizStart() {
   let interval;
 
   const checkStatus = async () => {
+    
     try {
       const res = await fetch(
         `/api/check-student?studentId=${studentId}&quizId=${quizId}`
@@ -81,8 +82,7 @@ export default function QuizStart() {
 
       if (!data.success) return;
 
-      const student = data.student;
-
+      const student = data.student;  
       // If submitted → stop polling
       if (student.submitted) {
         setShowResult(true);
@@ -92,9 +92,16 @@ export default function QuizStart() {
       }
 
       // If locked but not submitted
-      if (!student.submitted && student.locked) {
-        setLocked(true);
+      if (!student.submitted) {
+        if(student.locked){
+setLocked(true);
         setReason(student.lockedReason);
+
+        }else{
+          setLocked(false);
+          setReason("");
+        }
+        
       }
 
     } catch (error) {
@@ -103,7 +110,7 @@ export default function QuizStart() {
   };
 
   checkStatus();
-  interval = setInterval(checkStatus, 1000);
+  interval = setInterval(checkStatus, 2000);
 
   return () => {
     if (interval) clearInterval(interval);
