@@ -4,6 +4,7 @@ import "./globals.css";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { usePathname } from "next/navigation";
+import { NextAuthProvider } from "./components/Sessionprovider";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
         <Toaster position="top-center" />
 
         <AnimatePresence mode="wait">
+          <NextAuthProvider>
           <motion.div
             key={pathname}   // 🔥 IMPORTANT
             initial={{ opacity: 0, y: 15 }}
@@ -26,6 +28,7 @@ export default function RootLayout({ children }) {
           >
             {children}
           </motion.div>
+             </NextAuthProvider>
         </AnimatePresence>
 
       </body>

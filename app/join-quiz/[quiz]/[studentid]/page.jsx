@@ -67,28 +67,49 @@ export default function QuizStart() {
   /* =========================
      🔍 CHECK STATUS
   ==========================*/
-  useEffect(() => {
-    const checkStatus = async () => {
+ useEffect(() => {
+  if (!studentId || !quizId) return;
+
+  let interval;
+
+  const checkStatus = async () => {
+    try {
       const res = await fetch(
         `/api/check-student?studentId=${studentId}&quizId=${quizId}`
       );
       const data = await res.json();
 
       if (!data.success) return;
-if(!data.student.submitted) {if (data.student.locked) {
-        setLocked(true);
-        setReason(data.student.lockedReason);
-      }}
-      
 
-      if (data.student.submitted) {
+      const student = data.student;
+
+      // If submitted → stop polling
+      if (student.submitted) {
         setShowResult(true);
-        setScore(data.student.score);
+        setScore(student.score);
+        clearInterval(interval);
+        return;
       }
-    };
 
-    if (studentId && quizId) checkStatus();
-  }, [studentId, quizId]);
+      // If locked but not submitted
+      if (!student.submitted && student.locked) {
+        setLocked(true);
+        setReason(student.lockedReason);
+      }
+
+    } catch (error) {
+      console.error("Status check failed:", error);
+    }
+  };
+
+  checkStatus();
+  interval = setInterval(checkStatus, 1000);
+
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+
+}, [studentId, quizId]);
 
   /* =========================
      🔒 TAB SWITCH LOCK

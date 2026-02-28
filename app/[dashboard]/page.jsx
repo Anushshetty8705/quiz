@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
 
 export default function TeacherDashboard() {
   const { dashboard } = useParams();
@@ -38,6 +39,9 @@ export default function TeacherDashboard() {
         <h1 className="text-3xl font-bold tracking-wide">
           👨‍🏫 Teacher Dashboard
         </h1>
+        <button onClick={() => signOut({ callbackUrl: "/" })} className="bg-red-600 px-4 py-2 rounded-xl font-semibold hover:bg-red-700 transition">
+          Sign Out
+        </button>
 
         <Link href={`/${dashboard}/create-quiz`}>
           <button className="bg-indigo-600 px-6 py-2 rounded-2xl font-semibold hover:bg-indigo-700 transition shadow-lg hover:scale-105">

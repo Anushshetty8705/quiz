@@ -60,9 +60,11 @@ export default function QuizDetails() {
       fetchQuiz();
       interval = setInterval(fetchQuiz, 2000);
     }
-
     return () => clearInterval(interval);
   }, [id, dashboard]);
+
+
+
 
   const toggleQuizLock = async () => {
     try {

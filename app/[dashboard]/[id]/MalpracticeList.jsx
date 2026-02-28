@@ -11,7 +11,7 @@ export default function MalpracticeList({ students }) {
     setReports(malpracticeReports);
   }, [students]);
 
-  console.log("Reports:", reports);
+
 
   const handleUnlock = async (studentId, quizId) => {
     try {
@@ -32,7 +32,7 @@ export default function MalpracticeList({ students }) {
       console.error(err);
     }
   };
-  console.log("Malpractice reports:", reports); 
+
 
   if (!reports.length)
     return <p className="text-white">No students are flagged for malpractice.</p>;
