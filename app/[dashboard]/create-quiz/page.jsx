@@ -143,10 +143,10 @@ const router = useRouter();
                 <input
                   type="radio"
                   name={`correct-${qIndex}`}
-                  checked={q.correct === oIndex}
-                  className="accent-indigo-500"
-                  onChange={() =>
-                    updateQuestion(qIndex, "correct", oIndex)
+                   checked={q.correct === opt}
+      className="accent-indigo-500"
+      onChange={() =>
+        updateQuestion(qIndex, "correct", opt)
                   }
                 />
 

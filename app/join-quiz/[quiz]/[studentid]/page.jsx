@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { AlertTriangle } from "lucide-react"
@@ -141,6 +141,55 @@ setLocked(true);
 
 }, [showResult]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ useEffect(() => {
+  if (showResult) return; // ❌ Do nothing if quiz is submitted
+
+  const handleVisibility = async () => {
+    if (window.innerHeight < screen.height - 120) {
+      const message = "floating window detected";
+      setLocked(true);
+      setReason(message);
+      await reportLockToBackend(message);
+    }
+  };
+
+  document.addEventListener("visibilitychange", handleVisibility);
+
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibility);
+  };
+
+}, [showResult]);
+
+
+
+
+
+
+const shuffleArray = (array) => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
+
   /* =========================
      ⏳ TIMER
   ==========================*/
@@ -163,15 +212,26 @@ setLocked(true);
   /* =========================
      📥 FETCH QUESTIONS
   ==========================*/
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      const res = await fetch(`/api/questions?quizid=${quizId}`);
-      const data = await res.json();
-      if (data.success) setQuestions(data.questions);
-    };
+ useEffect(() => {
+  const fetchQuestions = async () => {
+    const res = await fetch(`/api/questions?quizid=${quizId}`);
+    const data = await res.json();
 
-    if (quizId) fetchQuestions();
-  }, [quizId]);
+    if (data.success) {
+      const shuffledQuestions = shuffleArray(
+        data.questions.map((q) => ({
+          ...q,
+          options: shuffleArray(q.options),
+        }))
+      );
+
+      setQuestions(shuffledQuestions);
+    }
+  };
+
+  if (quizId) fetchQuestions();
+}, [quizId]);
+  
 
   /* =========================
      📤 SUBMIT
@@ -390,17 +450,18 @@ setLocked(true);
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() =>
-                setAnswers({ ...answers, [current]: i })
+                setAnswers({ ...answers, [current]:opt})
               }
               className={`p-4 rounded-xl cursor-pointer border transition-all duration-300
                 ${
-                  answers[current] === i
+                 answers[current] === opt
                     ? "bg-indigo-600 border-indigo-400"
                     : "bg-white/10 border-white/20 hover:bg-white/20"
                 }`}
             >
               {opt}
             </motion.div>
+           
           ))}
         </div>
 
