@@ -3,41 +3,47 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";  
-export default function SocialButtons() {
-   const { data: session, status } = useSession();
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
-const router = useRouter(); 
-    useEffect(() => {
+export default function SocialButtons() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
       const saveSocialUser = async () => {
         try {
-          const toastId = toast.loading("Logging in...");
+          const toastId = toast.loading("Syncing profile...", {
+            style: { background: "#0f172a", color: "#fff" },
+          });
+
           const res = await fetch("/api/social-login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: session.user.email,
               name: session.user.name || "SocialUser",
-              Authprovider: "google facebook github",
+              Authprovider: "google github", // Cleaned up providers
             }),
           });
+
           const data = await res.json();
           toast.dismiss(toastId);
 
           if (res.ok && data.error === false) {
-           
-            toast.success("Login successful", { theme: "dark" });
-             router.push(`/${data.id}`);
+            toast.success(`Welcome, ${session.user.name.split(" ")[0]}!`, {
+              icon: "🚀",
+              style: { background: "#0f172a", color: "#fff" },
+            });
+            router.push(`/${data.id}`);
           } else {
             signOut();
-            toast.error(data.message || "Failed to save user ❌", {
-              theme: "dark",
-            });
+            toast.error(data.message || "Access denied ❌");
           }
         } catch (err) {
           console.error("Error saving user:", err);
-          toast.error("Server error ❌", { theme: "dark" });
+          toast.error("Network error ❌");
         }
       };
 
@@ -45,24 +51,31 @@ const router = useRouter();
     }
   }, [status, session, router]);
 
-
-
-
   return (
-    <div className="flex gap-3 mt-4">
-
+    <div className="flex gap-4 mt-2">
       {/* Google Button */}
-      <button onClick={() => signIn("google")} className="flex items-center justify-center gap-2 flex-1 bg-white text-black py-2 rounded-xl shadow-md border hover:bg-gray-100 transition">
-        <FaGoogle className="text-red-500 text-lg" />
-        <span className="font-medium" >Google</span>
-      </button>
+      <motion.button
+        whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => signIn("google")}
+        className="flex items-center justify-center gap-3 flex-1 bg-white/[0.04] border border-white/10 text-white py-3 rounded-2xl transition-colors duration-300"
+      >
+        <div className="bg-white p-1 rounded-full">
+            <FaGoogle className="text-red-500 text-xs" />
+        </div>
+        <span className="text-sm font-bold tracking-tight">Google</span>
+      </motion.button>
 
       {/* GitHub Button */}
-      <button onClick={() => signIn("github")} className="flex items-center justify-center gap-2 flex-1 bg-gray-900 text-white py-2 rounded-xl shadow-md hover:bg-black transition">
-        <FaGithub className="text-lg" />
-        <span className="font-medium">GitHub</span>
-      </button>
-
+      <motion.button
+        whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => signIn("github")}
+        className="flex items-center justify-center gap-3 flex-1 bg-white/[0.04] border border-white/10 text-white py-3 rounded-2xl transition-colors duration-300"
+      >
+        <FaGithub className="text-lg text-white" />
+        <span className="text-sm font-bold tracking-tight">GitHub</span>
+      </motion.button>
     </div>
   );
 }

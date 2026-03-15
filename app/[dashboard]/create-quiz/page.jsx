@@ -1,35 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { PlusCircle, Save, Copy } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { PlusCircle, Save, Copy, ArrowLeft, Trash2, CheckCircle2 } from "lucide-react";
 import { nanoid } from "nanoid";
 import toast, { Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 
 export default function CreateQuiz() {
-
-  const { dashboard } = useParams(); // ✅ correct way
-  const id = dashboard;
-const router = useRouter();
+  const { dashboard } = useParams();
+  const router = useRouter();
   const [quizCode] = useState(nanoid(8));
   const [subjectCode, setSubjectCode] = useState("");
 
   const [questions, setQuestions] = useState([
-    { question: "", options: ["", "", "", ""], correct: 0 }
+    { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0 }
   ]);
 
   const addQuestion = () => {
     setQuestions([
       ...questions,
-      { question: "", options: ["", "", "", ""], correct: 0 }
+      { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0 }
     ]);
   };
 
-  const updateQuestion = (qIndex, field, value) => {
+  const removeQuestion = (index) => {
+    if (questions.length === 1) return toast.error("At least one question is required");
+    setQuestions(questions.filter((_, i) => i !== index));
+  };
+
+  const updateQuestionText = (index, value) => {
     const newQ = [...questions];
-    newQ[qIndex][field] = value;
+    newQ[index].question = value;
     setQuestions(newQ);
   };
 
@@ -39,40 +41,42 @@ const router = useRouter();
     setQuestions(newQ);
   };
 
+  const setCorrectAnswer = (qIndex, oIndex) => {
+    const newQ = [...questions];
+    newQ[qIndex].correct = oIndex;
+    setQuestions(newQ);
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(quizCode);
     toast.success("Quiz code copied!");
   };
 
   const saveQuiz = async () => {
-    if (!subjectCode) {
-      toast.error("Please enter subject code");
-      return;
-    }
+    if (!subjectCode) return toast.error("Please enter subject code");
+    
+    // Simple validation
+    const isValid = questions.every(q => q.question && q.options.every(opt => opt !== ""));
+    if (!isValid) return toast.error("Please fill all questions and options");
 
     try {
       const response = await fetch("/api/quiz/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subjectCode,
           quizCode,
           questions,
-          teacherId: id, // ✅ sending dashboard id
+          teacherId: dashboard,
         }),
       });
 
       const data = await response.json();
-
       if (data.success) {
-        toast.success("Quiz saved successfully!");
-      setTimeout(() => {
-    router.push(`/${id}`);
-  }, 1000);// ✅ navigate to quiz page using returned id from API
+        toast.success("Quiz created successfully!");
+        setTimeout(() => router.push(`/${dashboard}`), 1500);
       } else {
-        toast.error(data.message || "Failed to save quiz");
+        toast.error(data.message || "Failed to save");
       }
     } catch (error) {
       toast.error("Server error");
@@ -80,108 +84,147 @@ const router = useRouter();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black text-white p-6 flex justify-center">
-      
-      <Toaster position="top-center" />
+    <div className="min-h-screen bg-[#050505] text-slate-200 pb-20">
+      <Toaster 
+        toastOptions={{
+          style: { background: '#1e1b4b', color: '#fff', border: '1px solid #3730a3' }
+        }} 
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-4xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl p-8 overflow-y-auto max-h-[90vh]"
-      >
-        <h2 className="text-3xl font-bold text-center mb-6">
-          📝 Create New Quiz
-        </h2>
-
-        {/* Subject + Quiz Code */}
-        <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <input
-            placeholder="Subject Code (e.g CS101)"
-            value={subjectCode}
-            onChange={(e) => setSubjectCode(e.target.value)}
-            className="w-full p-3 rounded-xl bg-white/20 border border-white/30 outline-none focus:ring-2 focus:ring-indigo-500 transition"
-          />
-
-          <div className="relative">
-            <input
-              className="w-full p-3 pr-12 rounded-xl bg-white/20 border border-white/30 outline-none focus:ring-2 focus:ring-purple-500 transition"
-              readOnly
-              value={quizCode}
-            />
-
-            <button
-              type="button"
-              onClick={copyToClipboard}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-purple-400 transition"
-            >
-              <Copy size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* Questions */}
-        {questions.map((q, qIndex) => (
-          <motion.div
-            key={qIndex}
-            className="bg-white/10 p-6 rounded-2xl mb-6 border border-white/20"
+      {/* STICKY HEADER */}
+      <nav className="sticky top-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/10 px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <button 
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition"
           >
-            <h3 className="font-semibold text-lg mb-3">
-              Question {qIndex + 1}
-            </h3>
-
-            <input
-              placeholder="Enter question"
-              value={q.question}
-              className="w-full p-3 mb-4 rounded-xl bg-white/20 border border-white/30 outline-none"
-              onChange={(e) =>
-                updateQuestion(qIndex, "question", e.target.value)
-              }
-            />
-
-            {q.options.map((opt, oIndex) => (
-              <div key={oIndex} className="flex items-center gap-3 mb-3">
-                <input
-                  type="radio"
-                  name={`correct-${qIndex}`}
-                   checked={q.correct === opt}
-      className="accent-indigo-500"
-      onChange={() =>
-        updateQuestion(qIndex, "correct", opt)
-                  }
-                />
-
-                <input
-                  placeholder={`Option ${oIndex + 1}`}
-                  value={opt}
-                  className="flex-1 p-2 rounded-lg bg-white/20 border border-white/30 outline-none"
-                  onChange={(e) =>
-                    updateOption(qIndex, oIndex, e.target.value)
-                  }
-                />
-              </div>
-            ))}
-          </motion.div>
-        ))}
-
-        {/* Buttons */}
-        <div className="flex flex-col md:flex-row gap-4 mt-4">
-          <button
-            onClick={addQuestion}
-            className="flex items-center justify-center gap-2 w-full bg-purple-600 py-3 rounded-2xl font-semibold hover:bg-purple-700 transition"
-          >
-            <PlusCircle size={20} />
-            Add Question
+            <ArrowLeft size={20} /> <span className="hidden sm:inline">Back</span>
           </button>
+          
+          <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            Create Assessment
+          </h1>
 
           <button
             onClick={saveQuiz}
-            className="flex items-center justify-center gap-2 w-full bg-indigo-600 py-3 rounded-2xl font-semibold hover:bg-indigo-700 transition"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-xl font-bold transition shadow-lg shadow-indigo-600/20"
           >
-            <Save size={20} />
-            Save Quiz
+            <Save size={18} /> Publish
           </button>
         </div>
-      </motion.div>
+      </nav>
+
+      <main className="max-w-4xl mx-auto px-6 pt-10">
+        
+        {/* QUIZ CONFIG */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Subject Title</label>
+            <input
+              placeholder="e.g. Advanced Mathematics"
+              value={subjectCode}
+              onChange={(e) => setSubjectCode(e.target.value)}
+              className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none focus:border-indigo-500/50 focus:bg-white/[0.05] transition text-lg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Invite Code</label>
+            <div className="relative group">
+              <input
+                className="w-full p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 outline-none text-indigo-400 font-mono font-bold"
+                readOnly
+                value={quizCode}
+              />
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-indigo-500/20 rounded-lg text-indigo-400 transition"
+              >
+                <Copy size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* QUESTIONS LIST */}
+        <div className="space-y-8">
+          <AnimatePresence>
+            {questions.map((q, qIndex) => (
+              <motion.div
+                key={q.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="relative bg-white/[0.03] border border-white/10 rounded-[2rem] p-8 shadow-xl"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <span className="bg-indigo-500/10 text-indigo-400 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-tighter">
+                    Question {qIndex + 1}
+                  </span>
+                  <button 
+                    onClick={() => removeQuestion(qIndex)}
+                    className="text-slate-500 hover:text-rose-500 transition p-2"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+
+                <textarea
+                  placeholder="What would you like to ask?"
+                  value={q.question}
+                  rows={2}
+                  onChange={(e) => updateQuestionText(qIndex, e.target.value)}
+                  className="w-full bg-transparent border-b border-white/10 pb-2 text-xl outline-none focus:border-indigo-500 transition resize-none mb-8"
+                />
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {q.options.map((opt, oIndex) => (
+                    <div 
+                      key={oIndex} 
+                      className={`flex items-center gap-3 p-2 rounded-2xl border transition-all ${
+                        q.correct === oIndex 
+                        ? "bg-emerald-500/10 border-emerald-500/40" 
+                        : "bg-white/5 border-transparent hover:border-white/10"
+                      }`}
+                    >
+                      <button
+                        onClick={() => setCorrectAnswer(qIndex, oIndex)}
+                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition ${
+                          q.correct === oIndex ? "bg-emerald-500 text-black" : "bg-white/10 text-slate-500"
+                        }`}
+                      >
+                        {q.correct === oIndex ? <CheckCircle2 size={16} /> : oIndex + 1}
+                      </button>
+
+                      <input
+                        placeholder={`Option ${oIndex + 1}`}
+                        value={opt}
+                        onChange={(e) => updateOption(qIndex, oIndex, e.target.value)}
+                        className="bg-transparent flex-1 outline-none text-sm py-2"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* BOTTOM ACTION */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={addQuestion}
+          className="mt-10 w-full py-10 border-2 border-dashed border-white/10 rounded-[2rem] flex flex-col items-center gap-3 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all group"
+        >
+          <div className="p-4 bg-white/5 rounded-full group-hover:bg-indigo-500/20 transition">
+            <PlusCircle size={32} />
+          </div>
+          <span className="font-bold tracking-tight">Add Another Question</span>
+        </motion.button>
+
+      </main>
     </div>
   );
 }

@@ -38,10 +38,11 @@ export async function GET(req) {
         quiz.studentCount = studentCount;
       })
     );
-console.log(quizzes);
+const user= await db.collection("users").findOne({ id: teacherId });
     return NextResponse.json({
       success: true,
       quizzes,
+      username: user ? user.name : "Unknown Teacher",
     });
 
   } catch (error) {

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { LogIn, UserPlus, ShieldCheck } from "lucide-react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
@@ -8,44 +9,77 @@ export default function AuthPage() {
   const [tab, setTab] = useState("login");
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-r from-indigo-600 to-purple-700 relative overflow-hidden">
-
-      {/* Blur Background */}
-      <div className="absolute w-72 h-72 blur-3xl top-10 left-10 "></div>
-      <div className="absolute w-72 h-72  blur-3xl bottom-10 right-10 "></div>
+    <div className="flex items-center justify-center min-h-screen px-4 bg-[#050505] relative overflow-hidden">
+      
+      {/* AUTH BACKGROUND GLOWS */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px]" />
+      </div>
 
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className=" p-8 rounded-2xl w-full max-w-md text-white"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md"
       >
-        {/* Tabs */}
-       <div className="relative bg-white/20 rounded-lg p-1 flex mb-6">
-  
-  <motion.div
-    layout
-    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-    className={`absolute top-1 bottom-1 w-1/2 bg-white rounded-md ${
-      tab === "login" ? "left-1" : "left-1/2"
-    }`}
-  />
+        {/* BRANDING LOGO */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="h-14 w-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-600/40 mb-4">
+            <ShieldCheck size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Instructor Portal</h1>
+          <p className="text-slate-500 text-sm mt-1">Access your quiz management suite</p>
+        </div>
 
-  <button
-    onClick={() => setTab("login")}
-    className="flex-1 py-2 z-10 font-semibold text-indigo-600"
-  >
-    Login
-  </button>
+        {/* GLASS CARD */}
+        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
+          
+          {/* PREMIUM TAB SWITCHER */}
+          <div className="relative bg-black/40 rounded-2xl p-1.5 flex mb-8 border border-white/5">
+            <motion.div
+              layout
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+              className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-indigo-600 rounded-xl shadow-lg shadow-indigo-600/20"
+              style={{ left: tab === "login" ? "6px" : "calc(50%)" }}
+            />
 
-  <button
-    onClick={() => setTab("register")}
-    className="flex-1 py-2 z-10 font-semibold text-indigo-600"
-  >
-    Register
-  </button>
-</div>
+            <button
+              onClick={() => setTab("login")}
+              className={`flex-1 py-3 z-10 font-bold text-sm flex items-center justify-center gap-2 transition-colors duration-300 ${
+                tab === "login" ? "text-white" : "text-slate-500 hover:text-slate-300"
+              }`}
+            >
+              <LogIn size={16} /> Login
+            </button>
 
-        {tab === "login" ? <LoginForm /> : <RegisterForm />}
+            <button
+              onClick={() => setTab("register")}
+              className={`flex-1 py-3 z-10 font-bold text-sm flex items-center justify-center gap-2 transition-colors duration-300 ${
+                tab === "register" ? "text-white" : "text-slate-500 hover:text-slate-300"
+              }`}
+            >
+              <UserPlus size={16} /> Register
+            </button>
+          </div>
+
+          {/* FORM CONTENT WITH FADE-IN */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, x: tab === "login" ? -10 : 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: tab === "login" ? 10 : -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {tab === "login" ? <LoginForm /> : <RegisterForm />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* FOOTER HINT */}
+        <p className="text-center mt-8 text-slate-600 text-xs tracking-widest uppercase font-medium">
+          Secure & Encrypted Session
+        </p>
       </motion.div>
     </div>
   );
