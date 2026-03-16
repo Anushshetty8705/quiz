@@ -12,6 +12,7 @@ export default function CreateQuiz() {
   const router = useRouter();
   const [quizCode] = useState(nanoid(8));
   const [subjectCode, setSubjectCode] = useState("");
+  const [Time, setTime] = useState()
 
   const [questions, setQuestions] = useState([
     { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0 }
@@ -67,6 +68,7 @@ export default function CreateQuiz() {
           subjectCode,
           quizCode,
           questions,
+          Time,
           teacherId: dashboard,
         }),
       });
@@ -124,6 +126,14 @@ export default function CreateQuiz() {
               placeholder="e.g. Advanced Mathematics"
               value={subjectCode}
               onChange={(e) => setSubjectCode(e.target.value)}
+              className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none focus:border-indigo-500/50 focus:bg-white/[0.05] transition text-lg"
+            />
+          </div>
+           <div className="md:col-span-1">
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Time in Mins</label>
+            <input
+              placeholder="e.g. 10"  
+              onChange={(e) => setTime(e.target.value)}
               className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none focus:border-indigo-500/50 focus:bg-white/[0.05] transition text-lg"
             />
           </div>

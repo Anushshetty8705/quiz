@@ -32,6 +32,7 @@ export async function GET(req) {
     return NextResponse.json({
       success: true,
       questions: quiz.questions, // 👈 return only questions array
+      Time:quiz.Time
     });
 
   } catch (error) {

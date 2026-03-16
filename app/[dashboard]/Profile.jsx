@@ -2,19 +2,36 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, ShieldCheck, Settings, Trash2, Edit3, Save, X } from "lucide-react";
+import toast from "react-hot-toast";
 
-export default function Profile({ teacherName }) {
+export default function Profile({ teacherName,dashboard }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: teacherName,
     department: "Academic Affairs",
   });
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     const confirmed = confirm("Are you absolutely sure? This will delete all your quizzes and student data permanently.");
     if (confirmed) {
-      console.log("Deleting account for:", teacherName);
-      // Add your API call here: await fetch('/api/teacher/delete', { method: 'DELETE' })
+      try{
+     const res = await fetch("api/delete-account",{
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json", 
+     },
+     body: JSON.stringify({ dashboard })
+     });
+     const data = await res.json();
+     if(data.success){
+      toast.success("Your account has been deleted. We're sorry to see you go!"); 
+    }
+
+    
+      }catch(err){
+        console.error("Error deleting account:", err);
+        toast.error("An error occurred while trying to delete your account. Please try again later.");
+      }
     }
   };
 

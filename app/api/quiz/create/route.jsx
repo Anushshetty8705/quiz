@@ -4,7 +4,7 @@ import clientPromise from "@/lib/mongodb"; // your MongoDB connection
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { subjectCode, quizCode, questions,teacherId } = body;
+    const { subjectCode, quizCode, questions,teacherId,Time} = body;
 
     if (!subjectCode || !questions || questions.length === 0) {
       return NextResponse.json(
@@ -21,6 +21,7 @@ export async function POST(req) {
       quizCode,
       questions,
       teacherId,
+      Time:Number(Time),
       createdAt: new Date(),
     });
 
