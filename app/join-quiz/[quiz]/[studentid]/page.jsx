@@ -95,6 +95,7 @@ export default function QuizStart() {
     return () => clearInterval(interval);
   }, [studentId, quizId, showResult]);
 
+
   useEffect(() => {
     if (timeLeft <= 0 && timeLeft !== undefined) {
       setLocked(true);

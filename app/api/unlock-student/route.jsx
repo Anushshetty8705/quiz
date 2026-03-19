@@ -13,7 +13,7 @@ export async function POST(req) {
 
     return new Response(JSON.stringify({ success: true }))
   } catch (err) {
-    console.error(err);
+ 
     return new Response(JSON.stringify({ success: false, error: err.message }), {
       status: 500,
     });

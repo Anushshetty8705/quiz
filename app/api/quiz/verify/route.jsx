@@ -20,6 +20,12 @@ export async function POST(req) {
       subjectCode,
       quizCode,
     });
+    if (!quiz) {
+      return NextResponse.json(
+        { success: false, message: "Invalid quiz details" },
+        { status: 404 }
+      );
+    }
     if(quiz.isLocked){
       return NextResponse.json(
         { success: false, message: "Quiz is locked contact your teacher " },
@@ -27,12 +33,7 @@ export async function POST(req) {
       );
     }
 
-    if (!quiz) {
-      return NextResponse.json(
-        { success: false, message: "Invalid quiz details" },
-        { status: 404 }
-      );
-    }
+    
 
     return NextResponse.json({
       success: true,

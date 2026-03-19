@@ -19,15 +19,16 @@ export default function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [teacherName, setTeacherName] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const [department, setdepartment] = useState()
 
-  useEffect(() => {
-    const fetchQuizzes = async () => {
+const fetchQuizzes = async () => {
       try {
         const res = await fetch(`/api/teacher-quiz?teacherId=${dashboard}`);
         const data = await res.json();
         if (data.success){
           setTeacherName(data.username);
           setQuizzes(data.quizzes);
+          setdepartment(data.department)
         } 
       } catch (err) {
         console.error("Failed to fetch quizzes", err);
@@ -35,6 +36,9 @@ export default function TeacherDashboard() {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
+    
     if (dashboard) fetchQuizzes();
   }, [dashboard]);
 
@@ -150,7 +154,7 @@ export default function TeacherDashboard() {
                 )}
               </motion.div>
             ) : (
-              <Profile teacherName={teacherName} />
+              <Profile teacherName={teacherName} department={department} dashboard={dashboard} onupdate={fetchQuizzes} setTeacherName={setTeacherName}/>
             )}
           </AnimatePresence>
         </div>
@@ -188,7 +192,7 @@ function TeacherProfile({ teacherName }) {
 
 function QuizCard({ quiz, dashboard, index }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="group bg-white/[0.03] border border-white/10 p-6 md:p-7 rounded-[2rem] md:rounded-[2.5rem]">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="group bg-white/[0.03] border border-white/10 p-6 md: rounded-[2rem] md:rounded-[2.5rem]">
       <div className="flex justify-between mb-6">
         <div className="p-2.5 md:p-3 bg-indigo-500/10 rounded-2xl text-indigo-400"><BookOpen size={24} /></div>
         <div className={`px-3 py-4 rounded-full text-[9px] md:text-[10px] font-bold uppercase border  ${quiz.isLocked ? "border-slate-500/20 text-slate-400" : "border-emerald-500/20 text-emerald-400"}`}>

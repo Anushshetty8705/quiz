@@ -13,12 +13,14 @@ import {
   LayoutDashboard,
   Users,
   Menu,
-  X
+  X,
+  Timer,BookOpen,
+  CheckCircle2 
 } from "lucide-react";
 
 import Leaderboard from "./Leaderboard";
 import ScoreGraph from "./ScoreGraph";
-import MalpracticeList from "./MalpracticeList";
+import MalpracticeList from "./MalpracticeList"
 
 export default function QuizDetails() {
   const { id, dashboard } = useParams();
@@ -29,6 +31,8 @@ export default function QuizDetails() {
   const [isLocked, setIsLocked] = useState(false);
   const [studentCount, setStudentCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+ const [time, settime] = useState()
+ const [questions, setquestions] = useState([])
 
   useEffect(() => {
     let interval;
@@ -41,6 +45,8 @@ export default function QuizDetails() {
           setStudents(studentsData);
           setIsLocked(data.isLocked);
           setStudentCount(studentsData.length);
+          settime(data.time)
+          setquestions(data.questions)
           
           const averageScore = studentsData.length > 0 
             ? studentsData.reduce((acc, curr) => acc + (curr.score || 0), 0) / studentsData.length 
@@ -97,6 +103,12 @@ export default function QuizDetails() {
         fixed inset-y-0 left-0 z-40 w-72 border-r border-white/10 bg-black backdrop-blur-xl p-6 flex flex-col gap-8 transition-transform duration-300 lg:translate-x-0 lg:static
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
+        <Link 
+          href={`/${dashboard}`} 
+          className="p-2 -ml-2 bg-white/5 rounded-lg text-slate-300 w-15 active:scale-95 transition-all"
+        >
+          <ChevronLeft size={20} />
+        </Link>
         <div className="hidden lg:block">
           <h2 className="text-indigo-400 font-bold tracking-widest text-xs uppercase mb-4">Quiz Control</h2>
         </div>
@@ -164,14 +176,55 @@ export default function QuizDetails() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-          >
-            {activeTab === "overview" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <StatCard title="Total Joined" value={studentCount} icon={<Users className="text-blue-400"/>} />
-                <StatCard title="Avg. Score" value={`${quiz?.averageScore.toFixed(1) || 0}%`} icon={<Trophy className="text-amber-400"/>} />
-                <StatCard title="Status" value={isLocked ? "Locked" : "Live"} icon={<div className={`h-3 w-3 rounded-full animate-pulse ${isLocked ? 'bg-gray-500' : 'bg-green-500'}`}/>} />
-              </div>
-            )}
+          >{activeTab === "overview" && (
+  <div className="space-y-8">
+    {/* Stats Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <StatCard title="Total Joined" value={studentCount} icon={<Users className="text-blue-400" />} />
+      <StatCard title="Avg. Score" value={`${quiz?.averageScore.toFixed(1) || 0}`} icon={<Trophy className="text-amber-400" />} />
+      <StatCard title="Status" value={isLocked ? "Locked" : "Live"} icon={<div className={`h-3 w-3 rounded-full animate-pulse ${isLocked ? 'bg-gray-500' : 'bg-green-500'}`} />} />
+      <StatCard title="Time Allocated" value={`${time} min`} icon={<Timer className="text-blue-400" />} />
+    </div>
+
+    {/* Questions List */}
+    <div className="bg-white bg-white/[0.03] rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-500" />
+        Quiz Questions
+      </h3>
+      
+      <div className="space-y-6">
+        {questions?.map((q, qIndex) => (
+          <div key={q.id || qIndex} className="pb-6 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <p className="font-medium text-gray-900 dark:text-gray-100 mb-3">
+              {qIndex + 1}. {q.question}
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {q.options.map((option, oIndex) => {
+                const isCorrect = option === q.correct;
+                return (
+                  <div 
+                    key={oIndex}
+                    className={`p-3 rounded-lg border text-sm transition-colors ${
+                      isCorrect 
+                        ? "bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400 font-medium" 
+                        : "bg-gray-50 border-gray-100 text-gray-600 dark:bg-gray-900/40 dark:border-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    <span className="mr-2 opacity-50">{String.fromCharCode(65 + oIndex)}.</span>
+                    {option}
+                    {isCorrect && <CheckCircle2 className="w-4 h-4 inline ml-2 mb-0.5" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
             {activeTab === "leaderboard" && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl overflow-x-auto">
@@ -229,6 +282,7 @@ function StatCard({ title, value, icon }) {
         <div className="p-2 bg-white/5 rounded-lg">{icon}</div>
       </div>
       <p className="text-2xl md:text-3xl font-bold text-white">{value}</p>
+      
     </div>
   );
 }

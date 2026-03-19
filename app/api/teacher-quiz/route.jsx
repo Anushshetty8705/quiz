@@ -43,6 +43,7 @@ const user= await db.collection("users").findOne({ id: teacherId });
       success: true,
       quizzes,
       username: user ? user.name : "Unknown Teacher",
+      department: user.department ? user.department:"Accademic" 
     });
 
   } catch (error) {

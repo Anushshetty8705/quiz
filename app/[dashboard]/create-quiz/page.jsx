@@ -15,13 +15,13 @@ export default function CreateQuiz() {
   const [Time, setTime] = useState()
 
   const [questions, setQuestions] = useState([
-    { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0 }
+    { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0}
   ]);
 
   const addQuestion = () => {
     setQuestions([
       ...questions,
-      { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0 }
+      { id: nanoid(), question: "", options: ["", "", "", ""], correct: 0}
     ]);
   };
 
@@ -44,7 +44,7 @@ export default function CreateQuiz() {
 
   const setCorrectAnswer = (qIndex, oIndex) => {
     const newQ = [...questions];
-    newQ[qIndex].correct = oIndex;
+    newQ[qIndex].correct =newQ[qIndex].options[oIndex];
     setQuestions(newQ);
   };
 
@@ -199,12 +199,12 @@ export default function CreateQuiz() {
                       }`}
                     >
                       <button
-                        onClick={() => setCorrectAnswer(qIndex, oIndex)}
+                        onClick={() => setCorrectAnswer(qIndex, oIndex,)}
                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition ${
                           q.correct === oIndex ? "bg-emerald-500 text-black" : "bg-white/10 text-slate-500"
                         }`}
                       >
-                        {q.correct === oIndex ? <CheckCircle2 size={16} /> : oIndex + 1}
+                        {q.correct=== q.options[oIndex] ? <CheckCircle2 size={16} /> : oIndex + 1}
                       </button>
 
                       <input

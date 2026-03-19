@@ -21,13 +21,8 @@ export async function GET(req) {
       .find()
       .toArray();
 
-    if (quizzedetails.length === 0) {
-      return NextResponse.json(
-        { success: false, message: "No quizzes found" },
-        { status: 404 }
-      );
-    }
-const coursecode = await db
+    // 
+const quiz = await db
       .collection("quizzes")
       .findOne({ quizCode: quizzid, teacherId: teacherId });
 
@@ -36,8 +31,10 @@ const coursecode = await db
     return NextResponse.json({
       success: true,
       quizzedetails,
-      coursecode: coursecode?.subjectCode || null,
-      isLocked: coursecode?.isLocked || false
+      coursecode: quiz?.subjectCode || null,
+      isLocked: quiz?.isLocked || false,
+      time:quiz.Time,
+      questions:quiz.questions
     });
 
   } catch (error) {
