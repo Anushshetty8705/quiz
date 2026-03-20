@@ -34,7 +34,7 @@ export default function StudentQuizAccess() {
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Identity Verified!");
+        const loading=toast.success("Identity Verified!");
         router.push(`/join-quiz/${quizCode}/student-info`);
       } else {
         toast.error(data.message || "Access Denied: Invalid details");
@@ -43,7 +43,7 @@ export default function StudentQuizAccess() {
       toast.error("Connection failed");
     } finally {
       setLoading(false);
-      toast.dismiss()
+      toast.dismiss(loading)
     }
   };
 
