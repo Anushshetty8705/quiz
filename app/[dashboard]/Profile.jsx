@@ -66,10 +66,9 @@ export default function Profile({
         });
         const data = await res.json();
         if (data.success) {
-signOut()
           toast.success("Your account has been deleted.");
           // Redirect user or logout here
-          window.location.href = "/";
+               signOut({ callbackUrl: "/" }) 
         } else {
           toast.error(data.message || "Failed to delete");
         }
