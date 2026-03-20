@@ -12,6 +12,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+<title>Quiz Pro – AI Proctored Quiz Platform with Secure Testing</title>
 
         {/* ✅ Keep Toaster outside */}
         <Toaster position="top-center" />
