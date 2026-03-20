@@ -111,7 +111,7 @@ export default function CreateQuiz() {
       }
     } catch (error) {
       toast.error("Server error. Please try again.");
-    }
+    }finally{toast.dismiss()}
   };
 
   return (
