@@ -14,7 +14,8 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
 
         {/* ✅ Keep Toaster outside */}
-        <Toaster position="top-center" />
+        <Toaster position="top-center"
+        toastOptions={duration=3000} />
 
         <AnimatePresence mode="wait">
           <NextAuthProvider>
