@@ -25,7 +25,7 @@ export default function StudentQuizAccess() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/quiz/verify", {
+      const response = await fetch("/api/StudentquizDetails-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subjectCode, quizCode }),

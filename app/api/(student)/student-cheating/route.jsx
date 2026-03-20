@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 export async function POST(request) {
-  const { reason, studentId, quizId } = await request.json();
+  const { reason, studentId, quizId,timeLeft } = await request.json();
 
   const client = await clientPromise;
   const db = client.db("Quiz");
@@ -9,7 +9,7 @@ export async function POST(request) {
 
   await collection.updateOne(
     { id: studentId },
-    { $set: { locked: true, lockedReason: reason } }
+    { $set: { locked: true, lockedReason: reason,timeLeft:Number(timeLeft) } }
   );
 
   return NextResponse.json({ success: true });

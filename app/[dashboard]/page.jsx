@@ -23,7 +23,7 @@ const [department, setdepartment] = useState()
 
 const fetchQuizzes = async () => {
       try {
-        const res = await fetch(`/api/teacher-quiz?teacherId=${dashboard}`);
+        const res = await fetch(`/api/teacher-quiz-list?teacherId=${dashboard}`);
         const data = await res.json();
         if (data.success){
           setTeacherName(data.username);

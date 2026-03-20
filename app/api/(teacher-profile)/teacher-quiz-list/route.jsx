@@ -21,13 +21,6 @@ export async function GET(req) {
       .find({ teacherId: teacherId })
       .toArray();
 
-    if (quizzes.length === 0) {
-      return NextResponse.json(
-        { success: false, message: "No quizzes found" },
-        { status: 404 }
-      );
-    }
-
     // ✅ Wait for all student counts
     await Promise.all(
       quizzes.map(async (quiz) => {

@@ -55,7 +55,7 @@ export default function Profile({
     background: '#1a1a1a',
     color: '#ffffff'
   });
-    if (confirmed) {
+    if (confirmed.isConfirmed) {
       const loadingToast = toast.loading("Deleting account...");
       try {
         const res = await fetch("/api/delete-account", {
