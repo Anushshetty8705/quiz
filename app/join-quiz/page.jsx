@@ -43,6 +43,7 @@ export default function StudentQuizAccess() {
       toast.error("Connection failed");
     } finally {
       setLoading(false);
+      toast.dismiss()
     }
   };
 
