@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from 'sweetalert2';
+import { signOut } from "next-auth/react";
 import {
   User,
   Settings,
@@ -67,7 +68,7 @@ export default function Profile({
         if (data.success) {
           toast.success("Your account has been deleted.");
           // Redirect user or logout here
-          window.location.href = "/";
+               signOut({ callbackUrl: "/" }) 
         } else {
           toast.error(data.message || "Failed to delete");
         }
