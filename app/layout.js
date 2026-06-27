@@ -15,8 +15,7 @@ export default function RootLayout({ children }) {
 <title>Quiz Pro – AI Proctored Quiz Platform with Secure Testing</title>
 
         {/* ✅ Keep Toaster outside */}
-        <Toaster position="top-center"
-        toastOptions={duration=3000} />
+        <Toaster position="top-center"/>
 
         <AnimatePresence mode="wait">
           <NextAuthProvider>
